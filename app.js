@@ -22,3 +22,51 @@ connection.connect(function(err) {
     startPrompt();
 });
 
+function startPrompt() {
+    inquirer.prompt([
+    {
+    type: "list",
+    message: "What would you like to do?",
+    name: "choice",
+    choices: [
+              "View All Employees?", 
+              "View All Employee's By Roles?",
+              "View all Emplyees By Deparments", 
+              "Add Employee?",
+              "Add Role?",
+              "Add Department?",
+              "Exit"
+            ]
+    }
+]).then(function(val) {
+        switch (val.choice) {
+            case "View All Employees?":
+              viewAllEmployees();
+            break;
+    
+          case "View All Employee's By Roles?":
+              viewAllRoles();
+            break;
+          case "View all Emplyees By Deparments":
+              viewAllDepartments();
+            break;
+          
+          case "Add Employee?":
+                addEmployee();
+              break;
+
+            case "Add Role?":
+                addRole();
+              break;
+      
+            case "Add Department?":
+                addDepartment();
+              break;
+
+            case "Exit":
+                connection.end();
+                break;
+    
+            }
+    })
+}
