@@ -89,3 +89,62 @@ role.title AS Title, name AS Department, role.salary AS Salary
 FROM employee_managerDB.department 
 INNER JOIN employee_managerdb.role ON employee_managerdb.department.id = employee_managerDB.role.department_id
 
+unction addEmployee() {
+    connection.query("SELECT title FROM employee_managerDB.role;", function(err, res) {
+        if (err) throw err;
+        let roleArr = [];
+        inquirer
+          .prompt([
+              {
+                  name: "role",
+                  type: "rawlist",
+                  choices: function() {
+                      for (let i = 0; i < res.length; i++) {
+                          roleArr.push(res[i].title);
+                      }
+                      return roleArr;
+                  },
+                  message: "What is the employee's role?"
+              },
+              {
+                  name: "firstname",
+                  type: "input",
+                  message: "What is the employee's first name?",
+              },
+              {
+                  name: "lastname",
+                  type: "input",
+                  message: "What is the employee's last name?"
+              },
+              {
+                  name: "manager",
+                  type: "number",
+                  message: "What is the employee's manager's ID?"
+              }
+          ])
+          .then(function(answer) {
+              connection.query("INSERT INTO employee SET ?",
+              {
+                  first_name: answer.firstname,
+                  last_name: answer.lastname,
+                  role_id: roleArr.indexOf(answer.role)+1,
+                  manager_id: answer.manager
+              });
+              runQuestions();
+          });
+    });
+}
+
+function viewEmployee() {
+    let query = "SELECT DISTINCT emp1.id, concat(emp1.first_name, ' ', emp1.last_name) AS Employee, ro1.title AS Job_Title, ";
+    query += "dep1.name AS Department, ro1.salary, concat(man1.first_name, ' ', man1.last_name) AS Manager_Name FROM employee emp1 ";
+    query += "INNER JOIN role ro1 ON ro1.id = emp1.role_id INNER JOIN department dep1 ON ro1.department_id = dep1.id LEFT JOIN employee man1 ";
+    query += "ON emp1.manager_id = man1.id INNER JOIN employee emp2 ON ro1.id = emp2.role_id ORDER BY id";
+    connection.query(query, function(err, res) {
+        if (err) throw err;
+        console.table(res);
+        runQuestions();
+    });
+}
+
+
